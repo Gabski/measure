@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Measure</title>
+    <style>
+        body{
+            margin:0;
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="paint" style="border:0px solid red;   background: #fff; cursor: crosshair"></canvas>
+
+<script>
+
+  var letsdraw ;
+
+  var theCanvas = document.getElementById('paint');
+  var ctx = theCanvas.getContext('2d');
+  theCanvas.width = 620;
+  theCanvas.height = 500;
+
+  var canvasOffset ={
+    left: 0,
+    top: 0
+  } //$('#paint').offset();
+ // console.log(window.innerWidth -theCanvas.getBoundingClientRect().right);
+
+
+  var fixNumber = function(num){
+    num *= 100;
+    return Math.round(parseFloat(num)) / 100;
+   }
+
+  var background = new Image();
+  background.src = "proj.png";
+  background.onload = function(){
+      ctx.drawImage(background,0,0);   
+  }
+
+  var howLong = function(x1,x2,y1,y2){
+
+    x1 = fixNumber(x1);
+    x2 = fixNumber(x2);
+
+    y1 = fixNumber(y1);
+    y2 = fixNumber(y2);
+
+    let xl = fixNumber(Math.abs(x1-x2));
+    let yl = fixNumber(Math.abs(y1-y2));
+    let long = Math.sqrt((xl*xl) + (yl*yl));
+
+    let scale = 1515 / 364;
+    return fixNumber(scale * long);
+  }
+
+
+ theCanvas.onmousemove = function(e) {
+    if (letsdraw) {
+      ctx.clearRect(0,0,theCanvas.width,theCanvas.height);
+      ctx.drawImage(background,0,0);   
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+    
+      ctx.moveTo(letsdraw.x, letsdraw.y);
+      ctx.lineTo(e.pageX - canvasOffset.left, e.pageY - canvasOffset.top);
+      ctx.stroke();
+
+      let long = howLong(letsdraw.x, e.pageX - canvasOffset.left, letsdraw.y, e.pageY - canvasOffset.top);
+      ctx.font = '28px serif';
+      ctx.fillText(long, 10, 480);
+    }
+  };
+
+  theCanvas.onmousedown = function(e) {
+    letsdraw = {
+      x:e.pageX - canvasOffset.left,
+      y:e.pageY - canvasOffset.top
+      }
+  };
+
+  theCanvas.onmouseup =function() {
+    letsdraw = null;
+  };
+
+
+</script>
+
+</body>
+</html>
